@@ -16,14 +16,14 @@ Callback.addCallback("PreLoaded", function() {
 		//BlockID.waterKineticGenerator,
 		//BlockID.steamKineticGenerator,
 	]);
-	/*Recipes.addShaped({id: BlockID.electricKineticGenerator, count: 1, data: 0}, [
+	Recipes.addShaped({id: BlockID.electricKineticGenerator, count: 1, data: 0}, [
 		"xbx",
 		"xsx",
 		"xmx"
-	], ['s', ItemID.shaftIron, 0, 'x', ItemID.casingIron, 0, 'm', ItemID.electricMotor, 0, 'b', ItemID.storageBattery, -1]);*/
+	], ['s', ItemID.shaftIron, 0, 'x', ItemID.casingIron, 0, 'm', ItemID.electricMotor, 0, 'b', ItemID.storageBattery, -1]);
 });
 
-const guiElectricKineticGenerator = MachineRegistry.createInventoryWindow("Electric Kinetic Generator ", {
+const guiElectricKineticGenerator = MachineRegistry.createInventoryWindow("Electric Kinetic Generator", {
 	drawing: [
 		{type: "bitmap", x: 342, y: 110, bitmap: "energy_small_background", scale: GUI_SCALE},
 		{type: "bitmap", x: 461, y: 250, bitmap: "heat_generator_info", scale: GUI_SCALE}
@@ -85,27 +85,15 @@ namespace Machine {
 			let output = 0;
 
 			if (this.data.energy >= 1) {
-				let side = this.getFacing();
-				Logger.Log("qqss", this.getFacing().toString());
-				let coords = StorageInterface.getRelativeCoords(this, side);
-				Logger.Log("sqss", coords.x.toString() + ";" + coords.y.toString() + ";" + coords.z.toString());
-
-				let tile = this.region.getTileEntity(coords) as IMomentOfMomentumConsumer;
-				if(tile !== null) {Logger.Log("joosqss", tile.toString());}
-				if (tile && tile.canReceiveAngularMomentum && tile.canReceiveAngularMomentum(side ^ 1)) {
-					Logger.Log("ss", "angular_electric");
-					output = tile.receiveAngularMomentum(Math.min(maxOutput, this.data.energy));
-					Logger.Log("ss", output.toString());
-					if (output > 0) {
-						this.setActive(true);
-						this.data.energy -= output;
-						let outputText = output.toString();
-						for (let i = outputText.length; i < 6; i++) {
-							outputText += " ";
-						}
-						this.container.setText("textInfo1", outputText + "/");
+				giveK(this, ths.data.energy, () => {if (output > 0) {
+					ths.setActive(true);
+					ths.data.energy -= output;
+					let outputText = output.toString();
+					for (let i = outputText.length; i < 6; i++) {
+						outputText += " ";
 					}
-				}
+					ths.container.setText("textInfo1", outputText + "/");
+				}})
 			}
 			if (output == 0) {
 				this.setActive(false);
@@ -129,4 +117,22 @@ namespace Machine {
 	}
 
 	MachineRegistry.registerPrototype(BlockID.electricKineticGenerator, new ElectricKineticGenerator());
+}
+
+function giveK(ths, kin, outp) {
+	let side = ths.getFacing();
+	Logger.Log("qqss", ths.getFacing().toString());
+	let coords = StorageInterface.getRelativeCoords(this, side);
+	Logger.Log("sqss", coords.x.toString() + ";" + coords.y.toString() + ";" + coords.z.toString());
+
+	let tile = ths.region.getTileEntity(coords) as IMomentOfMomentumConsumer;
+	if(tile !== null) {Logger.Log("joosqss", tile.toString());}
+	if (tile && tile.canReceiveAngularMomentum && tile.canReceiveAngularMomentum(side ^ 1)) {
+		Logger.Log("ss", "angular_electric");
+		output = tile.receiveAngularMomentum(Math.min(maxOutput, kin));
+		Logger.Log("ss", output.toString());
+		if(outp != null) {
+			outp();
+		}
+	}
 }

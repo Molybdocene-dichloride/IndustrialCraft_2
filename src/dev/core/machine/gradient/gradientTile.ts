@@ -5,9 +5,9 @@ namespace RotorRegistry {
 	}
 
 	class RotorTile {
-	  //general
-	  const id: string;
-    private count: number;
+		//general
+		const id: string;
+		private count: number;
 		private size: number;
 		
 		private mechanicalEfficiency: number; //КПД
@@ -24,7 +24,7 @@ namespace RotorRegistry {
 		}
 		
 		constructor(id: string, size: number, angle: Vector3, mechanicalEfficiency: number, durability: number, strengthWind: WindStrengthRange) {
-      this.id = id;
+			this.id = id;
 			this.angle = angle;
 			this.mechanicalEfficiency = mechanicalEfficiency;
 			this.size = size;
